@@ -185,6 +185,11 @@ function resolvePeersOfNode<T extends PartialResolvedPackage> (
   if (typeof node.children === 'function') {
     node.children = node.children()
   }
+
+  // if (nodeId.endsWith('/cacache/12.0.4>')) {
+  //   console.log({ 'promise-inflight': node.children['promise-inflight'] })
+  // }
+
   const children = node.children
   const parentPkgs = isEmpty(children)
     ? parentParentPkgs
@@ -300,6 +305,9 @@ function resolvePeersOfNode<T extends PartialResolvedPackage> (
           transitivePeerDependencies.add(unknownPeer)
         }
       }
+    }
+    if (depPath === '/cacache/12.0.4') {
+      console.log(`___DEBUGGING___ ctx.depGraph["/cacache/12.0.4"]: ${nodeId}`)
     }
     ctx.depGraph[depPath] = {
       ...(node.resolvedPackage as T),

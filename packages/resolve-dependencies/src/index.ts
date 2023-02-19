@@ -189,6 +189,12 @@ export default async function (
     virtualStoreDir: opts.virtualStoreDir,
   })
 
+  if (dependenciesGraph['/cacache/12.0.4'].children['promise-inflight'] === '/promise-inflight/1.0.1_bluebird@3.7.2') {
+    console.log('___DEBUGGING___: All is well')
+  } else {
+    console.log('___DEBUGGING___: Failed to resolve properly')
+  }
+
   for (const { id, manifest } of projectsToLink) {
     for (const [alias, depPath] of Object.entries(dependenciesByProjectId[id])) {
       const projectSnapshot = opts.wantedLockfile.importers[id]

@@ -326,7 +326,11 @@ export async function resolveDependencies (
     }
     newPreferredVersions[resolvedPackage.name][resolvedPackage.version] = 'version'
   }
+  const sizeBefore = postponedResolutionsQueue.length
   const childrenResults = await Promise.all(postponedResolutionsQueue.map(async (postponedResolution) => postponedResolution(newPreferredVersions, newParentPkgAliases)))
+  if (sizeBefore !== postponedResolutionsQueue.length) {
+    console.log('___DEBUGGING___ well that is weird: ', sizeBefore, postponedResolutionsQueue.length)
+  }
   if (!ctx.autoInstallPeers) {
     return {
       missingPeers: {},
@@ -428,8 +432,8 @@ async function resolveDependenciesOfDependency (
   }
   if (!resolveDependencyResult.isNew) return resolveDependencyResult
 
-  postponedResolutionsQueue.push(async (preferredVersions, parentPkgAliases) =>
-    resolveChildren(
+  postponedResolutionsQueue.push(async (preferredVersions, parentPkgAliases) => {
+    const resolved = await resolveChildren(
       ctx,
       resolveDependencyResult,
       parentPkgAliases,
@@ -439,7 +443,8 @@ async function resolveDependenciesOfDependency (
       updateDepth,
       preferredVersions
     )
-  )
+    return resolved
+  })
 
   return resolveDependencyResult
 }
@@ -901,6 +906,13 @@ async function resolveDependency (
   const installable = parentIsInstallable && pkgResponse.body.isInstallable !== false
   const isNew = !ctx.resolvedPackagesByDepPath[depPath]
 
+  if (nodeId === '>packages/workspace-2>/@storybook/builder-webpack5/6.4.19>/@storybook/core-common/6.4.19>/webpack/4.46.0>') {
+    const message = isNew
+      ? '___DEBUGGING___: Predicting a lockfile flicker'
+      : '___DEBUGGING___: Predicting stable lockfile'
+    console.log(message)
+  }
+
   if (isNew) {
     if (
       pkg.deprecated &&
@@ -1013,7 +1025,8 @@ function getMissingPeers (pkg: PackageManifest, parentPkgAliases: ParentPkgAlias
 function pkgIsLeaf (pkg: PackageManifest) {
   return isEmpty(pkg.dependencies ?? {}) &&
     isEmpty(pkg.optionalDependencies ?? {}) &&
-    isEmpty(pkg.peerDependencies ?? {})
+    isEmpty(pkg.peerDependencies ?? {}) &&
+    isEmpty(pkg.peerDependenciesMeta ?? {})
 }
 
 async function getResolvedPackage (

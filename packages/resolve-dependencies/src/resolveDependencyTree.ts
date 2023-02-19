@@ -162,6 +162,20 @@ export default async function<T> (
     )
   }))
 
+  const webpackFours = [
+    '>packages/workspace-2>/@storybook/react/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/builder-webpack5/6.4.19>/@storybook/core-common/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/react/6.4.19>/@storybook/core-common/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/manager-webpack5/6.4.19>/@storybook/core-common/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/react/6.4.19>/@storybook/core/6.4.19>/@storybook/core-server/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/react/6.4.19>/@storybook/core/6.4.19>/@storybook/core-server/6.4.19>/@storybook/builder-webpack4/6.4.19>/webpack/4.46.0>',
+    '>packages/workspace-2>/@storybook/react/6.4.19>/@storybook/core/6.4.19>/@storybook/core-server/6.4.19>/@storybook/manager-webpack4/6.4.19>/webpack/4.46.0>',
+  ]
+  for (const nodeId of webpackFours) {
+    const promiseInflight = ctx.dependenciesTree[`${nodeId}/terser-webpack-plugin/1.4.5>/cacache/12.0.4>`]?.children?.['promise-inflight']
+    console.log('___DEBUGGING___ before pendingNodes promise-inflight:', nodeId, promiseInflight)
+  }
+
   ctx.pendingNodes.forEach((pendingNode) => {
     ctx.dependenciesTree[pendingNode.nodeId] = {
       children: () => buildTree(ctx, pendingNode.nodeId, pendingNode.resolvedPackage.id,
