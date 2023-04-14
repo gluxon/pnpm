@@ -439,6 +439,9 @@ importers:
       '@pnpm/logger':
         specifier: ^5.0.0
         version: 5.0.0
+      '@pnpm/render-dedupe-check-issues':
+        specifier: workspace:*
+        version: link:../../packages/render-dedupe-check-issues
       '@pnpm/render-peer-issues':
         specifier: workspace:*
         version: link:../../packages/render-peer-issues
@@ -2442,6 +2445,28 @@ importers:
       '@pnpm/prepare':
         specifier: workspace:*
         version: link:../../__utils__/prepare
+
+  packages/render-dedupe-check-issues:
+    dependencies:
+      '@pnpm/types':
+        specifier: workspace:*
+        version: link:../types
+      archy:
+        specifier: ^1.0.0
+        version: 1.0.0
+      chalk:
+        specifier: ^4.1.2
+        version: 4.1.2
+    devDependencies:
+      '@pnpm/render-dedupe-check-issues':
+        specifier: workspace:*
+        version: 'link:'
+      '@types/archy':
+        specifier: 0.0.32
+        version: 0.0.32
+      strip-ansi:
+        specifier: ^6.0.1
+        version: 6.0.1
 
   packages/render-peer-issues:
     dependencies:
@@ -8795,7 +8820,7 @@ packages:
   /@types/byline@4.2.33:
     resolution: {integrity: sha512-LJYez7wrWcJQQDknqZtrZuExMGP0IXmPl1rOOGDqLbu+H7UNNRfKNuSxCBcQMLH1EfjeWidLedC/hCc5dDfBog==}
     dependencies:
-      '@types/node': 18.15.11
+      '@types/node': 14.18.42
     dev: true
 
   /@types/cacheable-request@6.0.3:
@@ -13491,7 +13516,7 @@ packages:
       jws: 3.2.2
       lodash: 4.17.21
       ms: 2.1.3
-      semver: 7.3.8
+      semver: 7.4.0
 
   /jsprim@1.4.2:
     resolution: {integrity: sha512-P2bSOMAc/ciLz6DzgjVlGJP9+BrJWu5UDGK70C2iweC5QBIeFf0ZXRvGjEj2uYgrY2MkAAhsSWHDWlFtEroZWw==}

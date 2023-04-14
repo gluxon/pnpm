@@ -36,6 +36,7 @@
     "@pnpm/config": "workspace:*",
     "@pnpm/core-loggers": "workspace:*",
     "@pnpm/error": "workspace:*",
+    "@pnpm/render-dedupe-check-issues": "workspace:*",
     "@pnpm/render-peer-issues": "workspace:*",
     "@pnpm/types": "workspace:*",
     "ansi-diff": "^1.1.1",

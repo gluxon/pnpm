@@ -3,6 +3,7 @@ import { UNIVERSAL_OPTIONS } from '@pnpm/common-cli-options-help'
 import renderHelp from 'render-help'
 import { type InstallCommandOptions } from './install'
 import { installDeps } from './installDeps'
+import { dedupeDiffCheck } from './dedupeDiffCheck'
 
 export function rcOptionsTypes () {
   return {}
@@ -52,5 +53,6 @@ export async function handler (opts: DedupeCommandOptions) {
     dedupe: true,
     include,
     includeDirect: include,
+    lockfileCheck: opts.check ? dedupeDiffCheck : undefined,
   }, [])
 }
