@@ -4,10 +4,15 @@ import renderHelp from 'render-help'
 import { type InstallCommandOptions } from './install'
 import { installDeps } from './installDeps'
 
-export const rcOptionsTypes = cliOptionsTypes
+export function rcOptionsTypes () {
+  return {}
+}
 
 export function cliOptionsTypes () {
-  return {}
+  return {
+    ...rcOptionsTypes(),
+    check: Boolean,
+  }
 }
 
 export const commandNames = ['dedupe']
@@ -20,6 +25,10 @@ export function help () {
         title: 'Options',
         list: [
           ...UNIVERSAL_OPTIONS,
+          {
+            description: 'Check if running dedupe would result in changes without installing packages or editing the lockfile. Exits with a non-zero status code if changes are possible.',
+            name: '--check',
+          },
         ],
       },
     ],
@@ -28,7 +37,11 @@ export function help () {
   })
 }
 
-export async function handler (opts: InstallCommandOptions) {
+export interface DedupeCommandOptions extends InstallCommandOptions {
+  readonly check?: boolean
+}
+
+export async function handler (opts: DedupeCommandOptions) {
   const include = {
     dependencies: opts.production !== false,
     devDependencies: opts.dev !== false,
