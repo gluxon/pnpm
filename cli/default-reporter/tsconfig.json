@@ -21,6 +21,9 @@
       "path": "../../packages/error"
     },
     {
+      "path": "../../packages/render-dedupe-check-issues"
+    },
+    {
       "path": "../../packages/render-peer-issues"
     },
     {

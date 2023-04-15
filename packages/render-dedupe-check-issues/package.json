@@ -1,0 +1,44 @@
+{
+  "name": "@pnpm/render-dedupe-check-issues",
+  "description": "Visualize pnpm dedupe --check issues.",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/pnpm/pnpm/issues"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "!*.map"
+  ],
+  "keywords": [
+    "pnpm8"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.14"
+  },
+  "repository": "https://github.com/pnpm/pnpm/blob/main/packages/render-dedupe-check-issues",
+  "scripts": {
+    "_test": "jest",
+    "test": "pnpm run compile && pnpm run _test",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prepublishOnly": "pnpm run compile",
+    "compile": "tsc --build && pnpm run lint --fix"
+  },
+  "homepage": "https://github.com/pnpm/pnpm/blob/main/packages/render-dedupe-check-issues#readme",
+  "funding": "https://opencollective.com/pnpm",
+  "dependencies": {
+    "@pnpm/types": "workspace:*",
+    "archy": "^1.0.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@pnpm/render-dedupe-check-issues": "workspace:*",
+    "@types/archy": "0.0.32",
+    "strip-ansi": "^6.0.1"
+  },
+  "exports": {
+    ".": "./lib/index.js"
+  }
+}

@@ -2,7 +2,8 @@ import { type Config } from '@pnpm/config'
 import { type Log } from '@pnpm/core-loggers'
 import { type PnpmError } from '@pnpm/error'
 import { renderPeerIssues } from '@pnpm/render-peer-issues'
-import { type PeerDependencyIssuesByProjects } from '@pnpm/types'
+import { renderDedupeCheckIssues } from '@pnpm/render-dedupe-check-issues'
+import { type DedupeCheckIssues, type PeerDependencyIssuesByProjects } from '@pnpm/types'
 import chalk from 'chalk'
 import equals from 'ramda/src/equals'
 import StackTracey from 'stacktracey'
@@ -66,6 +67,8 @@ function getErrorInfo (logObj: Log, config?: Config): {
       return reportEngineError(logObj as any) // eslint-disable-line @typescript-eslint/no-explicit-any
     case 'ERR_PNPM_PEER_DEP_ISSUES':
       return reportPeerDependencyIssuesError(err, logObj as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    case 'ERR_PNPM_DEDUPE_CHECK_ISSUES':
+      return reportDedupeCheckIssuesError(err, logObj as any) // eslint-disable-line @typescript-eslint/no-explicit-any
     case 'ERR_PNPM_FETCH_401':
     case 'ERR_PNPM_FETCH_403':
       return reportAuthError(err, logObj as any, config) // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -413,4 +416,11 @@ ${hints.map((hint) => `hint: ${hint}`).join('\n')}
 function getHasMissingPeers (issuesByProjects: PeerDependencyIssuesByProjects) {
   return Object.values(issuesByProjects)
     .some((issues) => Object.values(issues.missing).flat().some(({ optional }) => !optional))
+}
+
+function reportDedupeCheckIssuesError (err: Error, msg: { dedupeCheckIssues: DedupeCheckIssues }) {
+  return {
+    title: err.message,
+    body: renderDedupeCheckIssues(msg.dedupeCheckIssues),
+  }
 }
