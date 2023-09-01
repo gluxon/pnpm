@@ -20,6 +20,24 @@ import {
   spawnPnpm,
 } from './utils'
 
+// The global jest.setup.js file configures retry times to 1. The server tests
+// in this file are not retry-able since:
+//
+//   1. The `pnpm server stop` command needs to run before the next test.
+//      Otherwise the next test or retry will fail attempting to acquire
+//      exclusive resources like a TCP port. The server stop command does not
+//      run if the test fails in the middle.
+//   2. The exec commands from a previous test (e.g. pnpm install is-positive)
+//      can interfere with the retried test or the next test. It can be
+//      confusing and unclear if a test failed for this reason.
+//
+// These problems can be fixed by moving cleanup to a Jest afterEach block. The
+// cleanup function would need to stop the server and all processes running from
+// the test that failed. Keeping track of all spawned processes in a failing
+// test and closing them on failure is a bit complicated. Let's simply disable
+// retries for now.
+jest.retryTimes(0)
+
 const skipOnWindows = isWindows() ? test.skip : test
 
 // Third element is true if and only if we attempted to kill the process via a signal.
