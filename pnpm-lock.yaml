@@ -4165,6 +4165,9 @@ importers:
       '@pnpm/assert-project':
         specifier: workspace:*
         version: link:../../__utils__/assert-project
+      '@pnpm/dependency-path':
+        specifier: workspace:*
+        version: link:../../packages/dependency-path
       '@pnpm/modules-yaml':
         specifier: workspace:*
         version: link:../modules-yaml
