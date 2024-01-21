@@ -57,6 +57,7 @@ import { type NodeId, nextNodeId } from './nextNodeId'
 import { parentIdsContainSequence } from './parentIdsContainSequence'
 import { hoistPeers, getHoistableOptionalPeers } from './hoistPeers'
 import { wantedDepIsLocallyAvailable } from './wantedDepIsLocallyAvailable'
+import { type CatalogLookupMetadata } from './resolveDependencyTree'
 import { replaceVersionInPref } from './replaceVersionInPref'
 
 const dependencyResolvedLogger = logger('_dependency_resolved')
@@ -111,6 +112,7 @@ export interface LinkedDependency {
   name: string
   normalizedPref?: string
   alias: string
+  catalogLookup?: CatalogLookupMetadata
 }
 
 export interface PendingNode {
@@ -198,6 +200,7 @@ export type PkgAddress = {
   missingPeers: MissingPeers
   missingPeersOfChildren?: MissingPeersOfChildren
   publishedAt?: string
+  catalogLookup?: CatalogLookupMetadata
   optional: boolean
 } & ({
   isLinkedDependency: true
@@ -1245,6 +1248,7 @@ async function resolveDependency (
     }
     return {
       alias: wantedDependency.alias || pkgResponse.body.manifest.name || path.basename(pkgResponse.body.resolution.directory),
+      catalogLookup,
       dev: wantedDependency.dev,
       isLinkedDependency: true,
       name: pkgResponse.body.manifest.name,
@@ -1462,6 +1466,7 @@ async function resolveDependency (
   }
   return {
     alias: wantedDependency.alias || pkg.name,
+    catalogLookup,
     depIsLinked,
     isNew,
     nodeId,
