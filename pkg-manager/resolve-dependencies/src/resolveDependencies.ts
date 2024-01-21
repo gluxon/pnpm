@@ -1,4 +1,5 @@
 import path from 'path'
+import { matchCatalogResolveResult, type CatalogResolver } from '@pnpm/catalogs.resolver'
 import {
   deprecationLogger,
   progressLogger,
@@ -137,6 +138,7 @@ export interface ResolutionContext {
   allPreferredVersions?: PreferredVersions
   appliedPatches: Set<string>
   updatedSet: Set<string>
+  catalogResolver: CatalogResolver
   defaultTag: string
   dryRun: boolean
   forceFullResolution: boolean
@@ -1140,7 +1142,19 @@ async function resolveDependency (
       optional: true,
     }
   }
+
+  const catalogLookup = matchCatalogResolveResult(ctx.catalogResolver(wantedDependency), {
+    found: (result) => result.resolution,
+    unused: () => undefined,
+    misconfiguration: (result) => {
+      throw result.error
+    },
+  })
+
   try {
+    if (catalogLookup != null) {
+      wantedDependency.pref = catalogLookup.specifier
+    }
     if (!options.update && currentPkg.version && currentPkg.pkgId?.endsWith(`@${currentPkg.version}`)) {
       wantedDependency.pref = replaceVersionInPref(wantedDependency.pref, currentPkg.version)
     }
