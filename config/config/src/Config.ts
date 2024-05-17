@@ -6,6 +6,7 @@ import {
   type SslConfig,
 } from '@pnpm/types'
 import type { Hooks } from '@pnpm/pnpmfile'
+import { type WorkspaceManifest } from '@pnpm/workspace.read-manifest'
 
 export type UniversalOptions = Pick<Config, 'color' | 'dir' | 'rawConfig' | 'rawLocalConfig'>
 
@@ -176,6 +177,7 @@ export interface Config {
   changedFilesIgnorePattern?: string[]
   rootProjectManifestDir: string
   rootProjectManifest?: ProjectManifest
+  workspaceManifest?: WorkspaceManifest
   userConfig: Record<string, string>
 
   globalconfig: string
