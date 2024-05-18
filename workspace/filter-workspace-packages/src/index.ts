@@ -9,6 +9,7 @@ import pick from 'ramda/src/pick'
 import * as micromatch from 'micromatch'
 import { getChangedPackages } from './getChangedPackages'
 import { parsePackageSelector, type PackageSelector } from './parsePackageSelector'
+import { type WorkspaceManifest } from '@pnpm/workspace.read-manifest'
 
 export { parsePackageSelector, type PackageSelector }
 
@@ -81,6 +82,7 @@ export async function filterPackagesFromDir (
     nodeVersion?: string
     patterns: string[]
     supportedArchitectures?: SupportedArchitectures
+    workspaceManifest?: WorkspaceManifest
   }
 ): Promise<FilterPackagesFromDirResult> {
   const allProjects = await findWorkspacePackages(workspaceDir, {
@@ -89,6 +91,7 @@ export async function filterPackagesFromDir (
     sharedWorkspaceLockfile: opts.sharedWorkspaceLockfile,
     nodeVersion: opts.nodeVersion,
     supportedArchitectures: opts.supportedArchitectures,
+    workspaceManifest: opts.workspaceManifest,
   })
   return {
     allProjects,

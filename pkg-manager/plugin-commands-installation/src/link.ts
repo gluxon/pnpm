@@ -43,6 +43,7 @@ type LinkOpts = CreateStoreControllerOptions & Pick<Config,
 | 'saveOptional'
 | 'saveProd'
 | 'workspaceDir'
+| 'workspaceManifest'
 | 'sharedWorkspaceLockfile'
 > & Partial<Pick<Config, 'linkWorkspacePackages'>>
 

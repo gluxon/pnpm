@@ -80,6 +80,7 @@ export type InstallDepsOptions = Pick<Config,
 | 'optional'
 | 'workspaceConcurrency'
 | 'workspaceDir'
+| 'workspaceManifest'
 | 'extraEnv'
 | 'ignoreWorkspaceCycles'
 | 'disallowWorkspaceCycles'

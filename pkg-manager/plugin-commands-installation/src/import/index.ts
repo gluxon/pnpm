@@ -101,6 +101,7 @@ export type ImportCommandOptions = Pick<Config,
 | 'sharedWorkspaceLockfile'
 | 'rootProjectManifest'
 | 'rootProjectManifestDir'
+| 'workspaceManifest'
 > & CreateStoreControllerOptions & Omit<InstallOptions, 'storeController' | 'lockfileOnly' | 'preferredVersions'>
 
 export async function handler (

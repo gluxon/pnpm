@@ -204,6 +204,7 @@ export async function main (inputArgv: string[]): Promise<void> {
       linkWorkspacePackages: !!config.linkWorkspacePackages,
       prefix: process.cwd(),
       workspaceDir: wsDir,
+      workspaceManifest: config.workspaceManifest,
       testPattern: config.testPattern,
       changedFilesIgnorePattern: config.changedFilesIgnorePattern,
       useGlobDirFiltering: !config.legacyDirFiltering,
