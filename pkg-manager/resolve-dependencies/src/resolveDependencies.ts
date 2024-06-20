@@ -414,8 +414,8 @@ async function resolveDependenciesOfImporters (
       const postponedPeersResolutionQueue: PostponedPeersResolutionFunction[] = []
       const pkgAddresses: PkgAddress[] = []
 
-      const resolvedDependenciesOfImporter = await Promise.all(
-        extendedWantedDeps.map((extendedWantedDep) => resolveDependenciesOfDependency(
+      function resolveDependenciesOfImporter (extendedWantedDep: ExtendedWantedDependency) {
+        return resolveDependenciesOfDependency(
           ctx,
           importer.preferredVersions,
           {
@@ -424,8 +424,10 @@ async function resolveDependenciesOfImporters (
             pickLowestVersion: pickLowestVersion && !importer.updatePackageManifest,
           },
           extendedWantedDep
-        ))
-      )
+        )
+      }
+
+      const resolvedDependenciesOfImporter = await Promise.all(extendedWantedDeps.map(resolveDependenciesOfImporter))
 
       for (const { resolveDependencyResult, postponedPeersResolution, postponedResolution } of resolvedDependenciesOfImporter) {
         if (resolveDependencyResult) {
