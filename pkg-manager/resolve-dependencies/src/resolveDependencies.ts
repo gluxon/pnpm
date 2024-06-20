@@ -414,8 +414,24 @@ async function resolveDependenciesOfImporters (
       const postponedPeersResolutionQueue: PostponedPeersResolutionFunction[] = []
       const pkgAddresses: PkgAddress[] = []
 
-      function resolveDependenciesOfImporter (extendedWantedDep: ExtendedWantedDependency) {
-        return resolveDependenciesOfDependency(
+      async function resolveDependenciesOfImporter (extendedWantedDep: ExtendedWantedDependency) {
+        // The catalog protocol is only usable in importers (i.e. packages in
+        // the workspace. Replacing catalog protocol while resolving importers
+        // here before resolving dependencies of packages outside of the
+        // workspace/monorepo.
+        const catalogLookup = matchCatalogResolveResult(ctx.catalogResolver(extendedWantedDep.wantedDependency), {
+          found: (result) => result.resolution,
+          unused: () => undefined,
+          misconfiguration: (result) => {
+            throw result.error
+          },
+        })
+
+        if (catalogLookup != null) {
+          extendedWantedDep.wantedDependency.pref = catalogLookup.specifier
+        }
+
+        const result = await resolveDependenciesOfDependency(
           ctx,
           importer.preferredVersions,
           {
@@ -425,6 +441,14 @@ async function resolveDependenciesOfImporters (
           },
           extendedWantedDep
         )
+
+        // If the catalog protocol was used, store metadata about the catalog
+        // lookup to use in the lockfile.
+        if (result.resolveDependencyResult != null && catalogLookup != null) {
+          result.resolveDependencyResult.catalogLookup = catalogLookup
+        }
+
+        return result
       }
 
       const resolvedDependenciesOfImporter = await Promise.all(extendedWantedDeps.map(resolveDependenciesOfImporter))
@@ -1148,18 +1172,7 @@ async function resolveDependency (
     }
   }
 
-  const catalogLookup = matchCatalogResolveResult(ctx.catalogResolver(wantedDependency), {
-    found: (result) => result.resolution,
-    unused: () => undefined,
-    misconfiguration: (result) => {
-      throw result.error
-    },
-  })
-
   try {
-    if (catalogLookup != null) {
-      wantedDependency.pref = catalogLookup.specifier
-    }
     if (!options.update && currentPkg.version && currentPkg.pkgId?.endsWith(`@${currentPkg.version}`)) {
       wantedDependency.pref = replaceVersionInPref(wantedDependency.pref, currentPkg.version)
     }
@@ -1250,7 +1263,6 @@ async function resolveDependency (
     }
     return {
       alias: wantedDependency.alias || pkgResponse.body.manifest.name || path.basename(pkgResponse.body.resolution.directory),
-      catalogLookup,
       dev: wantedDependency.dev,
       isLinkedDependency: true,
       name: pkgResponse.body.manifest.name,
@@ -1468,7 +1480,6 @@ async function resolveDependency (
   }
   return {
     alias: wantedDependency.alias || pkg.name,
-    catalogLookup,
     depIsLinked,
     isNew,
     nodeId,
