@@ -543,6 +543,36 @@ describe('add', () => {
       packages: { 'is-positive@1.0.0': expect.objectContaining({}) },
     }))
   })
+
+  test('adding dependency in default catalog uses catalog protocol', async () => {
+    const { options, projects, readLockfile } = preparePackagesAndReturnObjects([{
+      name: 'project1',
+      dependencies: {},
+    }])
+
+    const updatedManifest = await addDependenciesToPackage(
+      projects['project1' as ProjectId],
+      ['is-positive'],
+      {
+        ...options,
+        lockfileOnly: true,
+        allowNew: true,
+        catalogs: {
+          default: { 'is-positive': '1.0.0' },
+        },
+      })
+
+    expect(updatedManifest).toEqual({
+      name: 'project1',
+      dependencies: {
+        'is-positive': 'catalog:',
+      },
+    })
+    expect(readLockfile()).toEqual(expect.objectContaining({
+      catalogs: { default: { 'is-positive': { specifier: '1.0.0', version: '1.0.0' } } },
+      packages: { 'is-positive@1.0.0': expect.objectContaining({}) },
+    }))
+  })
 })
 
 // The 'pnpm update' command should eventually support updates of dependencies
