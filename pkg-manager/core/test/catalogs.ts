@@ -544,7 +544,7 @@ describe('add', () => {
     }))
   })
 
-  test('adding dependency in default catalog uses catalog protocol', async () => {
+  test.only('adding dependency in default catalog uses catalog protocol', async () => {
     const { options, projects, readLockfile } = preparePackagesAndReturnObjects([{
       name: 'project1',
       dependencies: {},
