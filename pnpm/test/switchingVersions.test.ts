@@ -61,7 +61,7 @@ test('do not switch to pnpm version when a range is specified', async () => {
   expect(stdout.toString()).toContain('Cannot switch to pnpm@^9.3.0')
 })
 
-test('throws error if pnpm tools dir is corrupt', () => {
+test.only('throws error if pnpm tools dir is corrupt', () => {
   prepare()
   const pnpmHome = path.resolve('pnpm')
   const env = { PNPM_HOME: pnpmHome }
@@ -81,6 +81,7 @@ test('throws error if pnpm tools dir is corrupt', () => {
     fs.rmSync(path.join(toolDir, 'bin/pnpm.cmd'))
   }
 
-  const { stdout } = execPnpmSync(['help'], { env })
+  const { stdout, stderr } = execPnpmSync(['help'], { env })
+  console.error(stderr)
   expect(stdout.toString()).toContain('Failed to switch pnpm to v9.3.0. Looks like pnpm CLI is missing')
 })
