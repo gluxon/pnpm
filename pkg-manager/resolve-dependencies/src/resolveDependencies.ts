@@ -1085,9 +1085,13 @@ function referenceSatisfiesWantedSpec (
     return false
   }
   const { version } = nameVerFromPkgSnapshot(depPath, pkgSnapshot)
+
+  // Avoid re-resolving git protocol dependencies if the specifier is unchanged.
+  // https://github.com/pnpm/pnpm/pull/7054
   if (!semver.validRange(wantedDep.pref) && Object.values(opts.lockfile.importers).filter(importer => importer.specifiers[wantedDep.alias] === wantedDep.pref).length) {
     return true
   }
+
   return semver.satisfies(version, wantedDep.pref, true)
 }
 
