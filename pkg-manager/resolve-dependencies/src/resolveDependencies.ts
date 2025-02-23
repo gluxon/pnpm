@@ -190,6 +190,7 @@ export type PkgAddress = {
   depIsLinked: boolean
   isNew: boolean
   isLinkedDependency?: false
+  isInjected?: boolean
   nodeId: NodeId
   pkgId: PkgResolutionId
   normalizedPref?: string // is returned only for root dependencies
@@ -250,7 +251,7 @@ export interface ResolvedPackage {
   }
 }
 
-type ParentPkg = Pick<PkgAddress, 'nodeId' | 'installable' | 'rootDir' | 'optional' | 'pkgId'>
+type ParentPkg = Pick<PkgAddress, 'nodeId' | 'installable' | 'rootDir' | 'optional' | 'pkgId' | 'isInjected'>
 
 export type ParentPkgAliases = Record<string, PkgAddress | true>
 
@@ -830,8 +831,28 @@ async function resolveDependenciesOfDependency (
     supportedArchitectures: options.supportedArchitectures,
     parentIds: options.parentIds,
   }
-  const resolveDependencyResult = await resolveDependency(extendedWantedDep.wantedDependency, ctx, resolveDependencyOpts)
 
+  if (options.parentPkg.isInjected) {
+    const catalogLookup = matchCatalogResolveResult(ctx.catalogResolver(extendedWantedDep.wantedDependency), {
+      found: (result) => result.resolution,
+      unused: () => undefined,
+      misconfiguration: (result) => {
+        throw result.error
+      },
+    })
+
+    if (catalogLookup != null) {
+      // TODO: The standard code path short circuits to the resolved version in
+      // the pnpm-lock.yaml catalogs sections. If we don't do the same here,
+      // this dependency won't resolve the same way.
+      //
+      // Could there be discrepancies in the injected workspace package and the
+      // original as a result? We should double check this.
+      extendedWantedDep.wantedDependency.pref = catalogLookup.specifier
+    }
+  }
+
+  const resolveDependencyResult = await resolveDependency(extendedWantedDep.wantedDependency, ctx, resolveDependencyOpts)
   if (resolveDependencyResult == null) return { resolveDependencyResult: null }
   if (resolveDependencyResult.isLinkedDependency) {
     ctx.dependenciesTree.set(createNodeIdForLinkedLocalPkg(ctx.lockfileDir, resolveDependencyResult.resolution.directory), {
@@ -1530,6 +1551,7 @@ async function resolveDependency (
   return {
     alias: wantedDependency.alias || pkg.name,
     depIsLinked,
+    isInjected: wantedDependency.injected,
     isNew,
     nodeId,
     normalizedPref: options.currentDepth === 0 ? pkgResponse.body.normalizedPref : undefined,
