@@ -55,9 +55,14 @@ jobs:
           # privatePackages/*/lib
           # privatePackages/*/tsconfig.tsbuildinfo
           # .jest-cache
-          # .verdaccio-cache
         # key: ts-jest-${{ matrix.platform }}-${{ matrix.node }}-${{ github.run_id }}
         # restore-keys: ts-jest-${{ matrix.platform }}-${{ matrix.node }}-
+    - name: Cache Verdaccio
+      uses: actions/cache@v3
+      with:
+        path: .verdaccio-cache
+        key: v1-verdaccio-${{ matrix.platform }}-${{ matrix.node }}-${{ github.run_id }}
+        restore-keys: v1-verdaccio-${{ matrix.platform }}-${{ matrix.node }}-
     - name: run tests (main)
       timeout-minutes: 60
       if: github.ref_name == 'main'
