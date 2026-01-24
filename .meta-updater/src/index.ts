@@ -4,7 +4,6 @@ import { readWantedLockfile, type LockfileObject } from '@pnpm/lockfile.fs'
 import { type ProjectId, type ProjectManifest } from '@pnpm/types'
 import { createUpdateOptions, type FormatPluginFnOptions } from '@pnpm/meta-updater'
 import { sortDirectKeys, sortKeysByPriority } from '@pnpm/object.key-sorting'
-import { parsePkgAndParentSelector } from '@pnpm/parse-overrides'
 import { findWorkspacePackagesNoCheck } from '@pnpm/workspace.find-packages'
 import { readWorkspaceManifest } from '@pnpm/workspace.read-manifest'
 import isSubdir from 'is-subdir'
@@ -74,14 +73,6 @@ export default async (workspaceDir: string) => { // eslint-disable-line
           for (const depName of Object.keys(manifest[depType] ?? {})) {
             if (!manifest[depType]?.[depName].startsWith('workspace:')) {
               manifest[depType]![depName] = 'catalog:'
-            }
-          }
-        }
-        for (const depType of ['dependencies', 'optionalDependencies'] as const) {
-          if (!manifest[depType]) continue
-          for (const depName of Object.keys(manifest[depType] ?? {})) {
-            if (manifest[depType]?.[depName] === 'catalog:') {
-              throw new Error('The pnpm CLI package cannot have "catalog:" in prod deps as publish-packed does not support them currently')
             }
           }
         }
