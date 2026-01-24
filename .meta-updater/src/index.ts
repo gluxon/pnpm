@@ -69,14 +69,6 @@ export default async (workspaceDir: string) => { // eslint-disable-line
           }
         }
       } else {
-        manifest.pnpm = manifest.pnpm ?? {}
-        manifest.pnpm.overrides = { ...workspaceManifest!.overrides }
-        for (const selector in manifest.pnpm.overrides) {
-          if (manifest.pnpm.overrides[selector] === 'catalog:') {
-            const { targetPkg } = parsePkgAndParentSelector(selector)
-            manifest.pnpm.overrides[selector] = workspaceManifest!.catalog![targetPkg.name]
-          }
-        }
         for (const depType of ['devDependencies'] as const) {
           if (!manifest[depType]) continue
           for (const depName of Object.keys(manifest[depType] ?? {})) {
