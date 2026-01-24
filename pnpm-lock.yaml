@@ -492,6 +492,9 @@ catalogs:
     msgpackr:
       specifier: ^1.11.2
       version: 1.11.8
+    nm-prune:
+      specifier: ^5.0.0
+      version: 5.0.0
     nock:
       specifier: 13.3.4
       version: 13.3.4
@@ -6815,6 +6818,9 @@ importers:
       loud-rejection:
         specifier: 'catalog:'
         version: 2.2.0
+      nm-prune:
+        specifier: 'catalog:'
+        version: 5.0.0
       normalize-newline:
         specifier: 'catalog:'
         version: 4.1.0
@@ -25541,7 +25547,7 @@ snapshots:
     dependencies:
       bluebird: 3.7.2
       duplexer2: 0.1.4
-      fs-extra: 11.3.2
+      fs-extra: 11.3.3
       graceful-fs: 4.2.11(patch_hash=68ebc232025360cb3dcd3081f4067f4e9fc022ab6b6f71a3230e86c7a5b337d1)
       node-int64: 0.4.0
 
