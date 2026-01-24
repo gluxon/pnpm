@@ -492,12 +492,18 @@ catalogs:
     msgpackr:
       specifier: ^1.11.2
       version: 1.11.8
+    nm-prune:
+      specifier: ^5.0.0
+      version: 5.0.0
     nock:
       specifier: 13.3.4
       version: 13.3.4
     node-fetch:
       specifier: ^3.3.2
       version: 3.3.2
+    node-gyp:
+      specifier: ^11.1.0
+      version: 11.4.2
     normalize-newline:
       specifier: 4.1.0
       version: 4.1.0
@@ -6737,6 +6743,9 @@ importers:
       '@pnpm/workspace.find-packages':
         specifier: workspace:*
         version: link:../workspace/find-packages
+      '@pnpm/workspace.manifest-writer':
+        specifier: workspace:*
+        version: link:../workspace/manifest-writer
       '@pnpm/workspace.pkgs-graph':
         specifier: workspace:*
         version: link:../workspace/pkgs-graph
@@ -6815,6 +6824,9 @@ importers:
       loud-rejection:
         specifier: 'catalog:'
         version: 2.2.0
+      nm-prune:
+        specifier: 'catalog:'
+        version: 5.0.0
       normalize-newline:
         specifier: 'catalog:'
         version: 4.1.0
@@ -6865,8 +6877,8 @@ importers:
         version: 5.0.0
     optionalDependencies:
       node-gyp:
-        specifier: ^11.1.0
-        version: 11.1.0
+        specifier: 'catalog:'
+        version: 11.4.2
 
   pnpm/artifacts/exe:
     devDependencies:
@@ -14530,11 +14542,6 @@ packages:
     resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
     hasBin: true
 
-  node-gyp@11.1.0:
-    resolution: {integrity: sha512-/+7TuHKnBpnMvUQnsYEb0JOozDZqarQbfNuSGLXIjhStMT0fbw7IdSqWgopOP5xhRZE+lsbIvAHcekddruPZgQ==}
-    engines: {node: ^18.17.0 || >=20.5.0}
-    hasBin: true
-
   node-gyp@11.4.2:
     resolution: {integrity: sha512-3gD+6zsrLQH7DyYOUIutaauuXrcyxeTPyQuZQCQoNPZMHMMS5m4y0xclNpvYzoK3VNzuyxT6eF4mkIL4WSZ1eQ==}
     engines: {node: ^18.17.0 || >=20.5.0}
@@ -16679,7 +16686,7 @@ snapshots:
       '@babel/helper-replace-supers': 7.27.1(@babel/core@7.28.3)
       '@babel/helper-skip-transparent-expression-wrappers': 7.27.1
       '@babel/traverse': 7.28.3
-      semver: 7.7.2
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -17073,7 +17080,7 @@ snapshots:
   '@commitlint/is-ignored@19.8.1':
     dependencies:
       '@commitlint/types': 19.8.1
-      semver: 7.7.2
+      semver: 7.7.3
 
   '@commitlint/lint@19.8.1':
     dependencies:
@@ -19832,7 +19839,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
       picocolors: 1.1.1
       progress: 2.0.3
-      semver: 7.7.2
+      semver: 7.7.3
       tar-fs: 2.1.4
       yargs: 16.2.0
     transitivePeerDependencies:
@@ -23621,22 +23628,6 @@ snapshots:
   node-gyp-build@4.8.4:
     optional: true
 
-  node-gyp@11.1.0:
-    dependencies:
-      env-paths: 2.2.1
-      exponential-backoff: 3.1.2
-      glob: 11.1.0
-      graceful-fs: 4.2.11(patch_hash=68ebc232025360cb3dcd3081f4067f4e9fc022ab6b6f71a3230e86c7a5b337d1)
-      make-fetch-happen: 14.0.3
-      nopt: 8.1.0
-      proc-log: 5.0.0
-      semver: 7.7.2
-      tar: 7.5.4
-      which: 5.0.0
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   node-gyp@11.4.2:
     dependencies:
       env-paths: 2.2.1
@@ -23645,9 +23636,9 @@ snapshots:
       make-fetch-happen: 14.0.3
       nopt: 8.1.0
       proc-log: 5.0.0
-      semver: 7.7.2
+      semver: 7.7.3
       tar: 7.5.4
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       which: 5.0.0
     transitivePeerDependencies:
       - supports-color
@@ -25541,7 +25532,7 @@ snapshots:
     dependencies:
       bluebird: 3.7.2
       duplexer2: 0.1.4
-      fs-extra: 11.3.2
+      fs-extra: 11.3.3
       graceful-fs: 4.2.11(patch_hash=68ebc232025360cb3dcd3081f4067f4e9fc022ab6b6f71a3230e86c7a5b337d1)
       node-int64: 0.4.0
 
