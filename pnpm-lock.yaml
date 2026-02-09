@@ -5197,6 +5197,9 @@ importers:
       '@pnpm/registry-mock':
         specifier: 'catalog:'
         version: 5.2.1(verdaccio@6.2.5(encoding@0.1.13)(typanion@3.14.0))
+      '@pnpm/registry.types':
+        specifier: workspace:*
+        version: link:../../registry/types
       '@pnpm/store-path':
         specifier: workspace:*
         version: link:../../store/store-path
