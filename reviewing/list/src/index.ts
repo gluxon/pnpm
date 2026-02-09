@@ -1,11 +1,11 @@
 import path from 'path'
 import { safeReadProjectManifestOnly } from '@pnpm/read-project-manifest'
-import { type DependenciesField, type Registries, type Finder } from '@pnpm/types'
+import type { DependenciesField, Registries, Finder } from '@pnpm/types'
 import { type PackageNode, buildDependenciesHierarchy, type DependenciesHierarchy, createPackagesSearcher } from '@pnpm/reviewing.dependencies-hierarchy'
 import { renderJson } from './renderJson.js'
 import { renderParseable } from './renderParseable.js'
 import { renderTree } from './renderTree.js'
-import { type PackageDependencyHierarchy } from './types.js'
+import type { PackageDependencyHierarchy } from './types.js'
 
 export type { PackageNode } from '@pnpm/reviewing.dependencies-hierarchy'
 export { renderJson, renderParseable, renderTree, type PackageDependencyHierarchy }

@@ -1,8 +1,8 @@
-import {
-  type ResolutionChange,
-  type DedupeCheckIssues,
-  type ResolutionChangesByAlias,
-  type SnapshotsChanges,
+import type {
+  ResolutionChange,
+  DedupeCheckIssues,
+  ResolutionChangesByAlias,
+  SnapshotsChanges,
 } from '@pnpm/dedupe.types'
 import archy from 'archy'
 import chalk from 'chalk'

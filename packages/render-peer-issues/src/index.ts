@@ -1,6 +1,6 @@
-import {
-  type BadPeerDependencyIssue,
-  type PeerDependencyIssuesByProjects,
+import type {
+  BadPeerDependencyIssue,
+  PeerDependencyIssuesByProjects,
 } from '@pnpm/types'
 import archy from 'archy'
 import chalk from 'chalk'
