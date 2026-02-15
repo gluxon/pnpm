@@ -1,6 +1,6 @@
 import type { MutateModulesOptions, MutatedProject, ProjectOptions } from '@pnpm/core'
 import { prepareEmpty } from '@pnpm/prepare'
-import { PackageMeta } from '@pnpm/registry.types'
+import type { PackageMeta } from '@pnpm/registry.types'
 import type { ProjectRootDir, ProjectId, ProjectManifest } from '@pnpm/types'
 import fs from 'fs'
 import path from 'path'

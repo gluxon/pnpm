@@ -97,6 +97,8 @@ export type WorkspacePackages = Map<string, WorkspacePackagesByVersion>
 // It is important to give a bigger weight to direct dependencies.
 export const DIRECT_DEP_SELECTOR_WEIGHT = 1000
 
+export const EXISTING_VERSION_SELECTOR_WEIGHT = 1_000_000
+
 export type VersionSelectorType = 'version' | 'range' | 'tag'
 
 export interface VersionSelectors {

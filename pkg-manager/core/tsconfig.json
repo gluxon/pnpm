@@ -148,6 +148,9 @@
       "path": "../../pkg-manifest/read-project-manifest"
     },
     {
+      "path": "../../registry/types"
+    },
+    {
       "path": "../../resolving/resolver-base"
     },
     {
