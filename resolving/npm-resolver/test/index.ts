@@ -682,7 +682,7 @@ test('prefer the version that has bigger weight in preferred selectors', async (
     preferredVersions: {
       'is-positive': {
         '^3.0.0': 'range',
-        '3.0.0': { selectorType: 'version', weight: 100 },
+        '3.0.0': { selectorType: 'version', weight: [0, 1, 0] },
         '3.1.0': 'version',
       },
     },

@@ -93,11 +93,13 @@ export type WorkspacePackagesByVersion = Map<string, WorkspacePackage>
 
 export type WorkspacePackages = Map<string, WorkspacePackagesByVersion>
 
+export type VersionSelectorWeight = [number, number, number]
+
 // This weight is set for selectors that are used on direct dependencies.
 // It is important to give a bigger weight to direct dependencies.
-export const DIRECT_DEP_SELECTOR_WEIGHT = 1000
+export const DIRECT_DEP_SELECTOR_WEIGHT: VersionSelectorWeight = [0, 1, 0]
 
-export const EXISTING_VERSION_SELECTOR_WEIGHT = 1_000_000
+export const EXISTING_VERSION_SELECTOR_WEIGHT: VersionSelectorWeight = [1, 0, 0]
 
 export type VersionSelectorType = 'version' | 'range' | 'tag'
 
@@ -107,7 +109,7 @@ export interface VersionSelectors {
 
 export interface VersionSelectorWithWeight {
   selectorType: VersionSelectorType
-  weight: number
+  weight: VersionSelectorWeight
 }
 
 export interface PreferredVersions {

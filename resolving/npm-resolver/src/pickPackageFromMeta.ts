@@ -1,7 +1,7 @@
 import { PnpmError } from '@pnpm/error'
 import { filterPkgMetadataByPublishDate } from '@pnpm/registry.pkg-metadata-filter'
 import { type PackageInRegistry, type PackageMeta, type PackageMetaWithTime } from '@pnpm/registry.types'
-import { type VersionSelectors } from '@pnpm/resolver-base'
+import { VersionSelectorWeight, type VersionSelectors } from '@pnpm/resolver-base'
 import { type PackageVersionPolicy } from '@pnpm/types'
 import semver from 'semver'
 import util from 'util'
@@ -190,7 +190,7 @@ function prioritizePreferredVersions (
   const versionsPrioritizer = new PreferredVersionsPrioritizer()
   for (const [preferredSelector, preferredSelectorType] of preferredVerSelectorsArr) {
     const { selectorType, weight } = typeof preferredSelectorType === 'string'
-      ? { selectorType: preferredSelectorType, weight: 1 }
+      ? { selectorType: preferredSelectorType, weight: [0, 0, 1] satisfies VersionSelectorWeight }
       : preferredSelectorType
     if (preferredSelector === versionRange) continue
     switch (selectorType) {
@@ -219,25 +219,61 @@ function prioritizePreferredVersions (
 }
 
 class PreferredVersionsPrioritizer {
-  private preferredVersions: Record<string, number> = {}
+  private preferredVersions: Record<string, VersionSelectorWeight> = {}
 
-  add (version: string, weight: number): void {
+  add (version: string, weight: VersionSelectorWeight): void {
     if (!this.preferredVersions[version]) {
       this.preferredVersions[version] = weight
     } else {
-      this.preferredVersions[version] += weight
+      this.preferredVersions[version] = addWeights(this.preferredVersions[version], weight)
     }
   }
 
   versionsByPriority (): string[][] {
     const versionsByWeight = Object.entries(this.preferredVersions)
       .reduce((acc, [version, weight]) => {
-        acc[weight] = acc[weight] ?? []
-        acc[weight].push(version)
+        const weightKey = serializeWeight(weight)
+        acc[weightKey] ??= []
+        acc[weightKey].push(version)
         return acc
-      }, {} as Record<number, string[]>)
-    return Object.keys(versionsByWeight)
-      .sort((a, b) => parseInt(b, 10) - parseInt(a, 10))
-      .map((weight) => versionsByWeight[parseInt(weight, 10)])
+      }, {} as Record<string, string[]>)
+    return Object.entries(versionsByWeight)
+      .map(([weightKey, versions]) => [deserializeWeight(weightKey), versions] as const)
+      .sort(([a], [b]) => weightComparator(a, b))
+      .map(([_weight, version]) => version)
   }
+}
+
+function addWeights (a: VersionSelectorWeight, b: VersionSelectorWeight): VersionSelectorWeight {
+  return a.map((value, i) => value + b[i]) as VersionSelectorWeight
+}
+
+/**
+ * Compare two weights.
+ *
+ * Higher priority weights are considered to come before lower priorities. For
+ * example, [2, 1, 0] will come before [2, 0, 0].
+ */
+function weightComparator (a: VersionSelectorWeight, b: VersionSelectorWeight): number {
+  for (let i = 0; i < a.length; i++) {
+    const comparison = b[i] - a[i]
+
+    if (comparison !== 0) {
+      return comparison
+    }
+  }
+
+  return 0
+}
+
+function serializeWeight (weight: VersionSelectorWeight): string {
+  return weight.join(',')
+}
+
+function deserializeWeight (str: string): VersionSelectorWeight {
+  const parts = str.split(',')
+  if (parts.length !== 3) {
+    throw new Error('Failed to deserialize string as version selector weight: ' + str)
+  }
+  return parts.map(x => parseInt(x, 10)) as VersionSelectorWeight
 }
