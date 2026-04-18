@@ -266,6 +266,11 @@ export async function resolveDependencies (
 
     importers[index].manifest = updatedOriginalManifest ?? project.originalManifest ?? project.manifest
 
+    const directDependenciesByAlias: Record<string, ResolvedDirectDependency> = {}
+    for (const directDependency of resolvedImporter.directDependencies) {
+      directDependenciesByAlias[directDependency.alias] = directDependency
+    }
+
     for (const [alias, depPath] of dependenciesByProjectId[project.id].entries()) {
       const projectSnapshot = opts.wantedLockfile.importers[project.id]
       if (project.manifest.dependenciesMeta != null) {
@@ -278,12 +283,16 @@ export async function resolveDependencies (
         alias,
         realName: depNode.name,
       })
+      const dep = directDependenciesByAlias[alias]
+      const denormalizedRef = dep?.catalogLookup != null && ref === dep.version
+        ? dep.catalogLookup.userSpecifiedBareSpecifier
+        : ref
       if (projectSnapshot.dependencies?.[alias]) {
-        projectSnapshot.dependencies[alias] = ref
+        projectSnapshot.dependencies[alias] = denormalizedRef
       } else if (projectSnapshot.devDependencies?.[alias]) {
-        projectSnapshot.devDependencies[alias] = ref
+        projectSnapshot.devDependencies[alias] = denormalizedRef
       } else if (projectSnapshot.optionalDependencies?.[alias]) {
-        projectSnapshot.optionalDependencies[alias] = ref
+        projectSnapshot.optionalDependencies[alias] = denormalizedRef
       }
     }
   }))
@@ -404,12 +413,15 @@ function addDirectDependenciesToLockfile (
         alias: dep.alias,
         realName: dep.name,
       })
+      const denormalizedRef = dep.catalogLookup != null && ref === dep.version
+        ? dep.catalogLookup.userSpecifiedBareSpecifier
+        : ref
       if (dep.dev) {
-        newProjectSnapshot.devDependencies[dep.alias] = ref
+        newProjectSnapshot.devDependencies[dep.alias] = denormalizedRef
       } else if (dep.optional) {
-        newProjectSnapshot.optionalDependencies[dep.alias] = ref
+        newProjectSnapshot.optionalDependencies[dep.alias] = denormalizedRef
       } else {
-        newProjectSnapshot.dependencies[dep.alias] = ref
+        newProjectSnapshot.dependencies[dep.alias] = denormalizedRef
       }
       newProjectSnapshot.specifiers[dep.alias] = spec
     } else if (projectSnapshot.specifiers[alias]) {
