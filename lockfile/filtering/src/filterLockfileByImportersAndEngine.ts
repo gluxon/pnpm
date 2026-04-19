@@ -3,6 +3,7 @@ import { WANTED_LOCKFILE } from '@pnpm/constants'
 import * as dp from '@pnpm/deps.path'
 import { LockfileMissingDependencyError } from '@pnpm/error'
 import type {
+  CatalogSnapshots,
   LockfileObject,
   PackageSnapshots,
 } from '@pnpm/lockfile.types'
@@ -247,9 +248,28 @@ function parseDepRefs (refsByPkgNames: Array<[string, string]>, lockfile: Lockfi
       }
       continue
     }
-    const depPath = dp.refToRelative(ref, pkgName)
+    const resolvedRef = dereferenceCatalog(lockfile.catalogs, pkgName, ref)
+    if (resolvedRef == null) continue
+    const depPath = dp.refToRelative(resolvedRef, pkgName)
     if (depPath == null) continue
     acc.depPaths.push(depPath)
   }
   return acc
+}
+
+function dereferenceCatalog (catalogSnapshots: CatalogSnapshots | undefined, alias: string, reference: string): string | undefined {
+  if (!reference.startsWith('catalog:')) {
+    return reference
+  }
+
+  if (catalogSnapshots == null) {
+    return undefined
+  }
+
+  const catalogProtocolValue = reference.slice(8)
+  const catalogName = catalogProtocolValue === ''
+    ? 'default'
+    : catalogProtocolValue
+
+  return catalogSnapshots[catalogName]?.[alias].version
 }
