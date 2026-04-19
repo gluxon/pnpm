@@ -10,6 +10,7 @@ import * as dp from '@pnpm/deps.path'
 import { PnpmError } from '@pnpm/error'
 import { getPreferredVersionsFromLockfileAndManifests } from '@pnpm/lockfile.preferred-versions'
 import type {
+  CatalogSnapshots,
   LockfileObject,
   PackageSnapshot,
   ResolvedDependencies,
@@ -1116,6 +1117,9 @@ function getDepsToResolve (
         reference = preferredDependencies[wantedDependency.alias]
       }
     }
+    if (reference != null) {
+      reference = dereferenceCatalog(wantedLockfile.catalogs, wantedDependency.alias, reference)
+    }
     const infoFromLockfile = getInfoFromLockfile(wantedLockfile, options.registries, reference, wantedDependency.alias)
     if (
       !proceedAll &&
@@ -1144,6 +1148,23 @@ function getDepsToResolve (
   return extendedWantedDeps
 }
 
+function dereferenceCatalog (catalogSnapshots: CatalogSnapshots | undefined, alias: string, reference: string): string | undefined {
+  if (!reference.startsWith('catalog:')) {
+    return reference
+  }
+
+  if (catalogSnapshots == null) {
+    return undefined
+  }
+
+  const catalogProtocolValue = reference.slice(8)
+  const catalogName = catalogProtocolValue === ''
+    ? 'default'
+    : catalogProtocolValue
+
+  return catalogSnapshots[catalogName]?.[alias].version
+}
+
 function referenceSatisfiesWantedSpec (
   opts: {
     lockfile: LockfileObject
@@ -1152,7 +1173,15 @@ function referenceSatisfiesWantedSpec (
   wantedDep: { alias: string, bareSpecifier: string },
   preferredRef: string
 ) {
-  const depPath = dp.refToRelative(preferredRef, wantedDep.alias)
+  const ref = dereferenceCatalog(opts.lockfile?.catalogs, wantedDep.alias, preferredRef)
+  if (ref == null) {
+    logger.warn({
+      message: `Could not find catalog entry for ${wantedDep.alias} in lockfile`,
+      prefix: opts.prefix,
+    })
+    return false
+  }
+  const depPath = dp.refToRelative(ref, wantedDep.alias)
   if (depPath === null) return false
   const pkgSnapshot = opts.lockfile.packages?.[depPath]
   if (pkgSnapshot == null) {
