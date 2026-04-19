@@ -1,6 +1,7 @@
 import { LOCKFILE_VERSION } from '@pnpm/constants'
 import { refToRelative } from '@pnpm/deps.path'
 import type {
+  CatalogSnapshots,
   LockfileObject,
   PackageSnapshots,
   ProjectSnapshot,
@@ -24,9 +25,9 @@ export function pruneSharedLockfile (
   const copiedPackages = (lockfile.packages == null)
     ? {}
     : copyPackageSnapshots(lockfile.packages, {
-      devDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.devDependencies ?? {}))),
-      optionalDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.optionalDependencies ?? {}))),
-      prodDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.dependencies ?? {}))),
+      devDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.devDependencies ?? {}, lockfile.catalogs))),
+      optionalDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.optionalDependencies ?? {}, lockfile.catalogs))),
+      prodDepPaths: unnest(Object.values(lockfile.importers).map((deps) => resolvedDepsToDepPaths(deps.dependencies ?? {}, lockfile.catalogs))),
       warn: opts?.warn ?? ((_msg: string) => undefined),
       dependenciesGraph: opts?.dependenciesGraph,
     })
@@ -151,9 +152,29 @@ function copyPackageSnapshots (
   return copiedSnapshots
 }
 
-function resolvedDepsToDepPaths (deps: ResolvedDependencies): DepPath[] {
+function dereferenceCatalog (catalogSnapshots: CatalogSnapshots, alias: string, reference: string): string {
+  if (!reference.startsWith('catalog:')) {
+    return reference
+  }
+
+  const catalogProtocolValue = reference.slice(8)
+  const catalogName = catalogProtocolValue === ''
+    ? 'default'
+    : catalogProtocolValue
+
+  const version = catalogSnapshots[catalogName]?.[alias].version
+
+  // TODO: Surface this through the "missing" array.
+  if (version == null) {
+    throw new Error('Broken lockfile')
+  }
+
+  return version
+}
+
+function resolvedDepsToDepPaths (deps: ResolvedDependencies, catalogSnapshots?: CatalogSnapshots): DepPath[] {
   return Object.entries(deps)
-    .map(([alias, ref]) => refToRelative(ref, alias))
+    .map(([alias, ref]) => refToRelative(dereferenceCatalog(catalogSnapshots ?? {}, alias, ref), alias))
     .filter((depPath) => depPath !== null) as DepPath[]
 }
 

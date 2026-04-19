@@ -329,6 +329,10 @@ export async function resolveDependencies (
     }
   }
 
+  opts.wantedLockfile.catalogs = getCatalogSnapshots(
+    Object.values(resolvedImporters).flatMap(({ directDependencies }) => directDependencies),
+    updatedCatalogs)
+
   const newLockfile = updateLockfile({
     dependenciesGraph,
     lockfile: opts.wantedLockfile,
@@ -342,10 +346,6 @@ export async function resolveDependencies (
       ...time,
     }
   }
-
-  newLockfile.catalogs = getCatalogSnapshots(
-    Object.values(resolvedImporters).flatMap(({ directDependencies }) => directDependencies),
-    updatedCatalogs)
 
   // waiting till package requests are finished
   async function waitTillAllFetchingsFinish (): Promise<void> {

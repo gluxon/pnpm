@@ -64,6 +64,26 @@ export function lockfileWalker (
   const entryNodes = [] as DepPath[]
   const directDeps = [] as Array<{ alias: string, depPath: DepPath }>
 
+  function dereferenceCatalog (pkgName: string, reference: string): string {
+    if (!reference.startsWith('catalog:')) {
+      return reference
+    }
+
+    const catalogProtocolValue = reference.slice(8)
+    const catalogName = catalogProtocolValue === ''
+      ? 'default'
+      : catalogProtocolValue
+
+    const version = lockfile.catalogs?.[catalogName][pkgName].version
+
+    // TODO: Surface this through the "missing" array.
+    if (version == null) {
+      throw new Error('Broken lockfile')
+    }
+
+    return version
+  }
+
   for (const importerId of importerIds) {
     const projectSnapshot = lockfile.importers[importerId]
     Object.entries({
@@ -72,7 +92,7 @@ export function lockfileWalker (
       ...(opts?.include?.optionalDependencies === false ? {} : projectSnapshot.optionalDependencies),
     })
       .forEach(([pkgName, reference]) => {
-        const depPath = dp.refToRelative(reference, pkgName)
+        const depPath = dp.refToRelative(dereferenceCatalog(pkgName, reference), pkgName)
         if (depPath === null) return
         entryNodes.push(depPath)
         directDeps.push({ alias: pkgName, depPath })
